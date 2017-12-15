@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js.js"></script>
+    <script src="animate.js"></script>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding:0;
+        list-style: none;
+    }
+    body,html{
+        width:100%;
+        height:100%;
+        overflow: hidden;
+    }
+    img{
+        width: 100%;
+        height:100%;
+    }
+    .box{
+        width: 600px;
+        height:600px;
+        box-shadow: 0 0 10px #fff;
+        margin: 50px auto;
+        position: relative;
+        background-color: rgba(0,0,0,0.6);
+    }
+    .box>div{
+        width:30px;
+        height:30px;
+        /*border: 1px solid #000;*/
+        float: left;
+        box-sizing: border-box;
+    }
+    .box>span{
+        display: block;
+        width: 100px;
+        height:45px;
+        box-shadow: 0 0 10px #fff;
+        text-align: center;
+        font-family:"华文仿宋";
+        font-size: 34px;
+        color: #fbfbfb;
+        position: absolute;
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        margin:auto;
+    }
+    div.food{
+        width: 30px;
+        height: 30px;
+        background-color: red;
+        border-radius: 50%;
+    }
+    .snaker{
+        width:30px;
+        height:30px;
+        background-color: #0dcccc;
+        border-radius: 8px;
+    }
+    .fenshu,.load,.suspend{
+        width: 100px;
+        height:30px;
+        /*text-align: center;*/
+        line-height: 28px;
+        font-size: 20px;
+        background: #ccc;
+        box-shadow: 0 0 10px white;
+        position: fixed;
+        right: 260px;
+        top:130px;
+        font-family: "华文楷体";
+        display: none;
+        color: #333;
+        cursor: pointer;
+    }
+    .load{
+        top:190px;
+        text-align: center;
+    }
+    .suspend{
+        top:250px;
+        text-align: center;
+    }
+    .fenshu span{
+        text-align: left;
+        font-size: 20px;
+        color: black;
+        padding-left: 20px;
+        color: red;
+        font-weight: bold;
+    }
+    .start{
+        width:100%;
+        height:100%;
+        /*background-color: rgba(0,0,0,0.6);*/
+        position: absolute;
+        left: 0;
+        top:0;
+        background-image: url("img/2345_image_file_copy_2.jpg");
+        background-repeat: no-repeat;
+        opacity: 1;
+        cursor: pointer;
+    }
+    .starts{
+        width: 120px;
+        padding: 10px 15px;
+        box-shadow: 0 0 10px #25d523;
+        margin: 35% auto;
+        font-size: 24px;
+        line-height: 30px;
+        text-align: center;
+        color: #fff;
+        font-family: "华文彩云";
+    }
+    h1{
+        font-size: 80px;
+        text-align: center;
+        padding-top: 80px;
+        font-family: '华文仿宋';
+        -webkit-text-fill-color: red;
+        /* 文本描边颜色 */
+        -webkit-text-stroke-color: yellow;
+        /* 设置文本描边 */
+        -webkit-text-stroke-width: 1px;
+        font-weight: 800;
+        letter-spacing: 10px;
+        text-shadow: 0 3px 8px #fff;
+    }
+    .big{
+        width:100%;
+        height:100%;
+        position: fixed;
+        left:0;
+        top:0;
+        background:url("img/1353935565528.jpg") no-repeat;
+        background-size: 100%;
+    }
+</style>
+<body>
+<div class="big"></div>
+<div class="box">
+    <section class="start">
+        <h1>贪吃蛇</h1>
+        <div class="starts">开始游戏</div>
+    </section>
+</div>
+    <div class="fenshu">分数:<span>0</span></div>
+    <div class="load">重新开始</div>
+    <div class="suspend">暂停</div>
+</body>
+</html>
+<script>
+    var box=$('.box');
+    var fun=$(".fenshu");
+    for(var i=0;i<20;i++){
+        for(var j=0;j<20;j++){
+            var div=$("<div>");
+            div.id='r'+j+'-'+i;
+            box.appendChild(div);
+        };
+    };
+    var arr=[{x:0,y:0},{x:1,y:0},{x:2,y:0}];
+    arr.forEach(function (value) {
+        var obj=$('#r'+value.x+'-'+value.y);
+        obj.className='snaker';
+    });
+    var food=setFood();
+    console.log(food);
+    function setFood() {
+        do{
+            var x=Math.floor(Math.random()*20);
+            var y=Math.floor(Math.random()*20);
+        }while (check(x,y));
+        var foods=$("#r"+x+'-'+y);
+        foods.className='food';
+        return {x:x,y:y};
+    };
+    function check(m,n) {
+        var rest=arr.some(function (value) {
+            return value.x==m&&value.y==n
+        });
+        return rest;
+    };
+    var way='right';
+    var n=0;
+    function move () {
+        var oldhead=arr[arr.length-1];
+        var newheadx;
+        var newheady;
+//        console.log(arr[0])
+        switch (way){
+            case "right":
+                newheadx=oldhead.x+1;
+                newheady=oldhead.y;
+                break;
+            case "left":
+                newheadx=oldhead.x-1;
+                newheady=oldhead.y;
+                break;
+            case "top":
+                newheadx=oldhead.x;
+                newheady=oldhead.y-1;
+                break;
+            case "bottom":
+                newheadx=oldhead.x;
+                newheady=oldhead.y+1;
+                break;
+        };
+        if(newheadx<0||newheadx>19||newheady<0||newheady>19||check(newheadx,newheady)){
+            alert('game over');
+            clearInterval(t);
+            return;
+        }
+        var newobj=$("#r"+newheadx+'-'+newheady);
+        newobj.className="snaker";
+        arr.push({x:newheadx,y:newheady});
+        if(newheadx==food.x&&newheady==food.y){
+            n++;
+            food=setFood();
+        }else{
+            var first=$("#r"+arr[0].x+'-'+arr[0].y);
+            first.classList.remove("snaker");
+            arr.shift();
+        };
+        var funs=$(".fenshu span");
+        funs.innerHTML=`${n}`;
+    };
+    var t = null;
+    document.onkeydown=function (e) {
+        if(e.keyCode==37){
+            if(way=='right'){
+                return;
+            };
+            way='left';
+        }else if(e.keyCode==38){
+            if(way=='bottom'){
+                return;
+            };
+            way="top";
+        }else if(e.keyCode==39){
+            if(way=='left'){
+                return;
+            };
+            way='right';
+        }else if(e.keyCode==40){
+            if(way=='top'){
+                return;
+            }
+            way='bottom';
+        }
+    }
+//    开始按钮
+    var sta=$('.starts');
+    var back=$(".start");
+    var load=$(".load");
+    var suspend=$('.suspend');
+    var span =$("<span>");
+    var flag=0;
+    sta.onclick=function () {
+        animate(back,{opacity:0},500,function () {
+            t = setInterval(move,200);
+            fun.style.display='block';
+            load.style.display='block';
+            suspend.style.display='block';
+        })
+    };
+
+
+    load.onclick=function(){
+        history.go();
+    };
+    suspend.onclick=function () {
+        flag++;
+        if(flag%2!=0){
+            suspend.innerHTML='开始';
+            span.innerHTML='暂停';
+            box.appendChild(span);
+            clearInterval(t);
+        }else if(flag%2==0){
+            suspend.innerHTML='暂停';
+            t=setInterval(move,200);
+            box.removeChild(span);
+        };
+    };
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
